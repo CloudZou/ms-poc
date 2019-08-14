@@ -1,5 +1,6 @@
 ﻿using System.Net.Http;
 using System.Threading.Tasks;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
@@ -11,11 +12,13 @@ namespace ProductService
 {
     public class HttpTrigger
     {
-        private readonly HttpClient client;
+        private readonly HttpClient _client;
+        private readonly IMediator _mediator;
 
-        public HttpTrigger(IHttpClientFactory httpClientFactory)
+        public HttpTrigger(IMediator mediator,IHttpClientFactory httpClientFactory)
         {
-            client = httpClientFactory.CreateClient();
+            _mediator = mediator;
+            _client = httpClientFactory.CreateClient();
         }
 
         [FunctionName("GetPosts")]
@@ -23,7 +26,8 @@ namespace ProductService
             HttpRequest req, ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
-            var res = await client.GetAsync("https://microsoft.com");
+            var res = await _client.GetAsync("https://microsoft.com");
+            log.LogInformation(await res.Content.ReadAsStringAsync());
             return new OkResult();
         }
     }

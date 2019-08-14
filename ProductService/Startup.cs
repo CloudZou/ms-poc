@@ -1,4 +1,9 @@
-﻿using Microsoft.Azure.Functions.Extensions.DependencyInjection;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using MediatR;
+using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using ProductService;
 
@@ -10,8 +15,8 @@ namespace ProductService
         public override void Configure(IFunctionsHostBuilder builder)
         {
             builder.Services.AddHttpClient();
-//            builder.Services.AddMediatR();
-
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(a => !a.IsDynamic);
+            builder.Services.AddMediatR(assemblies.ToArray());
         }
     }
 }
